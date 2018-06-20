@@ -4,6 +4,86 @@ import ReactDOM from 'react-dom'
 class UserInfo extends React.Component {
   constructor(props) {
     super(props)
+
+    this.state = { message: '', region: {} }
+    this.changeProvice = this.changeProvice.bind(this)
+    this.changeCity = this.changeCity.bind(this)
+    this.submit = this.submit.bind(this)
+  }
+
+  componentDidMount() {
+    let elProvince = document.getElementById('province')
+
+    axios({
+      method: 'GET',
+      url: './assets/data/list.json',
+      responseType: 'json'
+    }).then(response => {
+      this.setState({ region: response.data })
+      for (let key in response.data) {
+        if (key.substr(2, 4) === '0000') {
+          elProvince.options.add(new Option(response.data[key], key))
+        }
+      }
+    })
+
+  }
+
+  changeProvice() {
+    let elProvince = document.getElementById('province')
+    let elCity = document.getElementById('city')
+    let elDistrict = document.getElementById('district')
+
+    elCity.innerHTML = ''
+    elCity.options.add(new Option('未选择', ''))
+    elDistrict.innerHTML = ''
+    elDistrict.options.add(new Option('未选择', ''))
+
+    for (let key in this.state.region) {
+      if (key.substr(0, 2) === elProvince.value.substr(0, 2) && key.substr(2, 4) !== '0000') {
+        if (elProvince.options[elProvince.options.selectedIndex].text.indexOf('市') !== -1) {
+          elCity.options.add(new Option(this.state.region[key], key))
+        } else {
+          if (key.substr(4, 2) === '00') {
+            elCity.options.add(new Option(this.state.region[key], key))
+          }
+        }
+      }
+    }
+  }
+
+  changeCity() {
+    let elProvince = document.getElementById('province')
+    let elCity = document.getElementById('city')
+    let elDistrict = document.getElementById('district')
+
+    elDistrict.innerHTML = ''
+    elDistrict.options.add(new Option('未选择', ''))
+
+    if (elProvince.options[elProvince.options.selectedIndex].text.indexOf('市') !== -1) {
+      return false
+    }
+
+    for (let key in this.state.region) {
+      if (key.substr(0, 4) === elCity.value.substr(0, 4) && key.substr(4, 2) !== '00') {
+        elDistrict.options.add(new Option(this.state.region[key], key))
+      }
+    }
+  }
+
+  submit() {
+    this.setState({ message: '' })
+    let elName = document.getElementById('name')
+    let elMobile = document.getElementById('mobile')
+    let elProvince = document.getElementById('province')
+    let elCity = document.getElementById('city')
+    let elAddress = document.getElementById('address')
+    let elPostage = document.getElementById('postage')
+
+    if (!!!elName.value || !!!elMobile.value || !!!elProvince.value || !!!elCity.value || !!!elAddress.value || !!!elPostage.checked) {
+      this.setState({ message: '请完整填写用户信息。' })
+      return false
+    }
   }
 
   render() {
@@ -12,11 +92,6 @@ class UserInfo extends React.Component {
         <div className="col-12">
           <h2>填写用户信息</h2>
           <hr/>
-
-          <div className="form-group">
-            <label className="text-primary">产品</label>
-            <input type="text" id="prod-name" className="form-control" readOnly="true"/>
-          </div>
 
           <div className="form-group">
             <label className="text-primary">姓名</label>
@@ -32,11 +107,17 @@ class UserInfo extends React.Component {
 
           <div className="form-group">
             <label className="text-primary">收货地址</label>
-            <select id="province" className="form-control"></select>
+            <select id="province" className="form-control" onChange={this.changeProvice}>
+              <option value="">未选择</option>
+            </select>
             <br/>
-            <select id="city" className="form-control"></select>
+            <select id="city" className="form-control" onChange={this.changeCity}>
+              <option value="">未选择</option>
+            </select>
             <br/>
-            <select id="district" className="form-control"></select>
+            <select id="district" className="form-control">
+              <option value="">未选择</option>
+            </select>
             <span className="text-secondary">新疆、西藏、港澳台等地区不参与此次活动</span>
           </div>
 
@@ -62,8 +143,13 @@ class UserInfo extends React.Component {
             <br/>
           </div>
         
+          {this.state.message && <div className="col-12 alert alert-danger">
+            {this.state.message}
+          </div>
+          }
+
           <div className="col-12">
-            <button type="button" id="submit" className="btn btn-outline-dark btn-block">
+            <button type="button" id="submit" className="btn btn-outline-dark btn-block" onClick={this.submit}>
               填写完毕，确认提交。
             </button>
           </div>

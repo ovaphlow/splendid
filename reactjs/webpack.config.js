@@ -5,6 +5,9 @@ module.exports = {
   // mode: 'production',
   entry: {
     'index': './src/index.js',
+    
+    'mgr.register': './src/mgr.register.js',
+    'mgr.login': './src/mgr.login.js'
   },
 
   // devtool: 'inline-source-map',
