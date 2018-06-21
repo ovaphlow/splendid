@@ -11,17 +11,35 @@ class MgrLogin extends React.Component {
 
   submit() {
     this.setState({ message: '' })
+
     if (!!!document.getElementById('account').value || !!!document.getElementById('password').value) {
-      this.setState({ message: '请完整填写注册信息。' })
+      this.setState({ message: '请完整填写登录信息。' })
       return false
     }
+
+    axios({
+      method: 'POST',
+      url: '../api/user/login',
+      data: {
+        account: document.getElementById('account').value,
+        password: document.getElementById('password').value
+      },
+      responseType: 'json'
+    }).then(response => {
+      if (response.data.message) {
+        this.setState({ message: response.data.message })
+      } else {
+        localStorage.setItem('auth', JSON.stringify(response.data.content))
+        location.href = 'index.html'
+      }
+    })
   }
 
   render() {
     return (
       <div className="row">
         <div className="col-12">
-          <h3>员工注册</h3>
+          <h3>员工登录</h3>
           <hr/>
         </div>
 
@@ -38,13 +56,18 @@ class MgrLogin extends React.Component {
                 <input type="password" id="password" className="form-control"/>
               </div>
 
-              { this.state.message && <div className="col-12 alert alert-danger">
+              {this.state.message && <div className="col-12 alert alert-danger">
                 {this.state.message}
-              </div> }
+              </div>}
 
-              <button type="button" id="submit" className="btn btn-outline-primary btn-block" onClick={this.submit}>
-                <i className="fa fa-fw fa-sign-in"></i> 注册
+              <button type="button" id="submit" className="btn btn-outline-dark btn-block" onClick={this.submit}>
+                <i className="fa fa-fw fa-sign-in"></i> 登录
               </button>
+
+              <p className="text-center">
+                <br/>
+                <a href="register.html">注册账号</a>
+              </p>
             </div>
           </div>
         </div>

@@ -7,7 +7,8 @@ module.exports = {
     'index': './src/index.js',
     
     'mgr.register': './src/mgr.register.js',
-    'mgr.login': './src/mgr.login.js'
+    'mgr.login': './src/mgr.login.js',
+    'mgr.index': './src/mgr.index.js'
   },
 
   // devtool: 'inline-source-map',
