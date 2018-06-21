@@ -12,6 +12,11 @@ class UserInfo extends React.Component {
   }
 
   componentDidMount() {
+    // console.log(location.search)
+    let uuid = urlParameter('uuid')
+    if (!!!uuid) {
+      this.setState({ message: '链接来源异常。' })
+    }
     let elProvince = document.getElementById('province')
 
     axios({
@@ -26,7 +31,6 @@ class UserInfo extends React.Component {
         }
       }
     })
-
   }
 
   changeProvice() {
@@ -84,6 +88,24 @@ class UserInfo extends React.Component {
       this.setState({ message: '请完整填写用户信息。' })
       return false
     }
+
+    axios({
+      method: 'POST',
+      url: './api/customer/',
+      data: {
+        user_uuid: urlParameter('uuid'),
+        name: elName.value,
+        mobile: elMobile.value,
+        province: elProvince.value,
+        city: elCity.value,
+        district: document.getElementById('district').value,
+        address: elAddress.value,
+        postage: elPostage.checked
+      },
+      responseType: 'json'
+    }).then(response => {
+      console.log(response.data)
+    })
   }
 
   render() {

@@ -9,6 +9,26 @@ logger.level = config.app.logLevel
 
 const router = express.Router()
 
+router.route('/:uuid/customer').get((req, res) => {
+  let sql = `
+    select
+      *
+    from
+      customer
+    where
+      user_uuid = :uuid
+  `
+  sequelize.query(sql, {
+    replacements: { uuid: req.params.uuid },
+    type: sequelize.QueryTypes.SELECT
+  }).then(result => {
+    res.json({ content: result, message: '' })
+  }).catch(err => {
+    logger.error(err)
+    res.json({ content: '', message: '服务器错误。' })
+  })
+})
+
 router.route('/login').post((req, res) => {
   let sql = `
     select

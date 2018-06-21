@@ -10,17 +10,27 @@ logger.level = config.app.logLevel
 const router = express.Router()
 
 router.route('/').post((req, res) => {
+  logger.info(req.body)
   let sql = `
     insert into
       customer
     set
-
+      uuid = uuid(),
+      user_uuid = :user_uuid,
+      name = :name,
+      mobile = :mobile,
+      province = :province,
+      city = :city,
+      district = :district,
+      address = :address,
+      postage = :postage
   `
   sequelize.query(sql, {
-    replacements: { account: req.body.account },
+    replacements: req.body,
     type: sequelize.QueryTypes.INSERT
   }).then(result => {
-    logger.info(result)
+    if (result[1] === 1) res.json({ content: '', message: '' })
+    else res.json({ content: '', message: '保存数据失败。' })
   }).catch(err => {
     logger.error(err)
     res.json({ content: '', message: '服务器错误。', status: 500 })

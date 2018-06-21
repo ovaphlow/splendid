@@ -1,11 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { CLIENT_RENEG_LIMIT } from 'tls';
 
 class MgrIndex extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { user: {}, qrcode: '' }
+    this.state = { user: {}, qrcode: '', customer: [] }
   }
 
   componentDidMount() {
@@ -13,6 +14,15 @@ class MgrIndex extends React.Component {
     this.setState({ user: user })
 
     if (user.valid) this.setState({ qrcode: 'http://qr.liantu.com/api.php?&bg=ffffff&text=http://cdtlab.cn/splendid/?uuid=' + user.uuid })
+
+    axios({
+      method: 'GET',
+      url: '../api/user/' + user.uuid + '/customer',
+      responseType: 'json'
+    }).then(response => {
+      console.log(response.data)
+      this.setState({ customer: response.data.content })
+    })
   }
 
   render() {
@@ -37,11 +47,11 @@ class MgrIndex extends React.Component {
 
         <div className="col-12">
           <div className="list-group">
-            {this.props.ar.map(item =>
+            {this.state.customer.map(item =>
               <a href="#" id={item.id} className="list-group-item list-group-item-action" key={item.id}>
                 客户名称{item.name}
                 <span className="pull-right text-secondary">
-                  时间
+                  时间{item.city}
                 </span>
               </a>
             )}
